@@ -145,7 +145,7 @@ async def user_credential_generator(field, populated_field=None, **kwargs):
 
 def generate_unique_username(base_name):
     username = base_name.lower().replace(" ", "_")
-    # TODO: cacheing usernames
+    # TODO: caching usernames
     while CustomUser.objects.filter(username=username).exists():
         username = f"{base_name.lower().replace(' ', '_')}_{random.randint(9, 9)}"
     return username

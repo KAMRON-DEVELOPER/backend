@@ -33,15 +33,12 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'storages',
-    'corsheaders',
     'channels',
     'django_celery_beat',
 
     'shared_app',
     'users_app',
     'community_app',
-    'education_app',
-    'entertainment_app'
 ]
 
 MIDDLEWARE = [
