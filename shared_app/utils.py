@@ -128,10 +128,10 @@ async def upload_image_to_storage(image_data, object_key):
     else:
         image_data.seek(0)  # rewind the BytesIO
         default_storage.save(object_key, ContentFile(image_data.read()))
-        print(f"3) 🥳 Image successfully saved to local storage with filename: users//avatar.jpg")
+        print("3) 🥳 Image successfully saved to local storage with filename: users//avatar.jpg")
 
 
-# TODO GENERATORS
+# TODO: generators
 async def user_credential_generator(field, populated_field=None, **kwargs):
     if field == "username" and populated_field is not None:
         return generate_unique_username(populated_field)

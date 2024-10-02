@@ -23,6 +23,8 @@ firebase_credentials = credentials.Certificate({
     "auth_provider_x509_cert_url": env.str("AUTH_PROVIDER_X509_CERT_URI", default=""),
     "client_x509_cert_url": env.str("FIREBASE_CLIENT_CERT_URL", default="")
 })
+
+
 firebase_admin.initialize_app(firebase_credentials)
 
 
@@ -35,20 +37,20 @@ async def custom_firebase_validation(firebase_id_token):
    """
     try:
         decoded_token = await asyncio.to_thread(partial(auth.verify_id_token, firebase_id_token))
-        print(f"DECODED_TOKEN: {decoded_token}")
+        print(f"📝 DECODED_TOKEN: {decoded_token}")
         uid = decoded_token["uid"]
         try:
             user = await asyncio.to_thread(partial(auth.get_user, uid))
-            print(f"USER: {user}")
+            print(f"📝 USER: {user}")
             return {
                 "display_name": user.display_name,
                 "email": user.email,
                 "phone_number": user.phone_number,
                 "photo_url": user.photo_url,
             }
-        except auth.UserNotFoundError:
-            print("user not exist")
+        except Exception as e:
+            print(f"🥶 user not exist: {e}")
             return None
-    except auth.ExpiredIdTokenError:
-        print("invalid token")
+    except Exception as e:
+        print(f"🥶 invalid token: {e}")
         return None

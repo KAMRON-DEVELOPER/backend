@@ -29,12 +29,14 @@ async def update_banner_color(instance):
 
 @receiver(post_save, sender=CustomUser)
 async def set_banner_color_when_user_created(sender, instance, created, **kwargs):
+    print(f"sender: {sender}")
     if created or "banner" in instance.get_dirty_fields():
         await update_banner_color(instance)
 
 
 @receiver(post_delete, sender=CustomUser)
 async def delete_user_avatar_and_banner(sender, instance, **kwargs):
+    print(f"sender: {sender}")
     if settings.STORAGE_DESTINATION == "s3":
         s3, aws_storage_bucket_name = await get_s3_client_async()
         user_folder_key = f"{settings.MEDIA_LOCATION}/users/user_{instance.username}/"

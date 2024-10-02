@@ -8,6 +8,7 @@ from .views import (
     FirebaseSocialAuthAPIView,
 )
 
+
 urlpatterns = [
     path('all/', CustomUsersAPIView.as_view()),
     path('register/', RegisterAPIView.as_view()),
