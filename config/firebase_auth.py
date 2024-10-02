@@ -11,20 +11,33 @@ env = Env()
 # Todo: remove when using docker env_file
 Env.read_env(BASE_DIR / ".env")
 
-firebase_credentials = credentials.Certificate({
-    "type": env.str("TYPE", default=""),
-    "project_id": env.str("FIREBASE_PROJECT_ID", default=""),
-    "private_key_id": env.str("FIREBASE_PRIVATE_KEY_ID", default=""),
-    "private_key": env.str("FIREBASE_PRIVATE_KEY", default="", multiline=True),
-    "client_email": env.str("FIREBASE_CLIENT_EMAIL", default=""),
-    "client_id": env.str("FIREBASE_CLIENT_ID", default=""),
-    "auth_uri": env.str("AUTH_URI", default=""),
-    "token_uri": env.str("TOKEN_URI", default=""),
-    "auth_provider_x509_cert_url": env.str("AUTH_PROVIDER_X509_CERT_URI", default=""),
-    "client_x509_cert_url": env.str("FIREBASE_CLIENT_CERT_URL", default="")
-})
+
+try:
+    print("private_key 1:", env('FIREBASE_PRIVATE_KEY'))
+    print("private_key 2:", env('FIREBASE_PRIVATE_KEY').replace("\\n", "\n"))
+    print("private_key 3:", env.str('FIREBASE_PRIVATE_KEY', multiline=False))
+    print("private_key 4:", env.str('FIREBASE_PRIVATE_KEY', multiline=True))
+except Exception as e:
+    print(f" Firebase credentials error: {e}")
+
+# firebase_credentials = credentials.Certificate({
+#     "type": env.str("TYPE", default=""),
+#     "project_id": env.str("FIREBASE_PROJECT_ID", default=""),
+#     "private_key_id": env.str("FIREBASE_PRIVATE_KEY_ID", default=""),
+#     "private_key": env.str("FIREBASE_PRIVATE_KEY", default="", multiline=True),
+#     "client_email": env.str("FIREBASE_CLIENT_EMAIL", default=""),
+#     "client_id": env.str("FIREBASE_CLIENT_ID", default=""),
+#     "auth_uri": env.str("AUTH_URI", default=""),
+#     "token_uri": env.str("TOKEN_URI", default=""),
+#     "auth_provider_x509_cert_url": env.str("AUTH_PROVIDER_X509_CERT_URI", default=""),
+#     "client_x509_cert_url": env.str("FIREBASE_CLIENT_CERT_URL", default="")
+# })
+# firebase_admin.initialize_app(firebase_credentials)
 
 
+firebase_credentials_path = BASE_DIR / "firebase_credentials.json"
+print(f"Firebase credentials path: {firebase_credentials_path}")
+firebase_credentials = credentials.Certificate(firebase_credentials_path)
 firebase_admin.initialize_app(firebase_credentials)
 
 

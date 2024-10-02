@@ -269,7 +269,6 @@ EMAIL_HOST_PASSWORD = env.str("EMAIL_HOST_PASSWORD", default="")
 ⌛️
 ⏰
 🎄
-⚔️
 🛡️
 🥳
 🥶
@@ -287,9 +286,6 @@ EMAIL_HOST_PASSWORD = env.str("EMAIL_HOST_PASSWORD", default="")
 🔎
 🗑️
 📐
-☢️
-☣️
-⚠️
 ✅
 ❌
 🇺🇲
@@ -303,7 +299,6 @@ EMAIL_HOST_PASSWORD = env.str("EMAIL_HOST_PASSWORD", default="")
 🚧
 🛰️
 🚀
-❄️
 🎈
 
 
