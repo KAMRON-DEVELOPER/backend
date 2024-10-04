@@ -128,30 +128,31 @@ async def upload_image_to_storage(image_data, object_key):
     else:
         image_data.seek(0)  # rewind the BytesIO
         default_storage.save(object_key, ContentFile(image_data.read()))
-        print("3) 🥳 Image successfully saved to local storage with filename: users//avatar.jpg")
+        print(f"3) 🥳 Image successfully saved to local storage with filename: {object_key}")
 
 
 # TODO: generators
-async def user_credential_generator(field, populated_field=None, **kwargs):
+async def user_credential_generator(field, populated_field=None, generated_username=None):
     if field == "username" and populated_field is not None:
-        return generate_unique_username(populated_field)
+        return await generate_unique_username(populated_field)
 
     if field == "password":
-        return generate_password(length=8)
+        return await generate_password(length=8)
 
     if field == "avatar" and populated_field is not None:
-        return await generate_avatar_url(populated_field, **kwargs)
+        return await generate_avatar_url(populated_field, generated_username)
 
 
-def generate_unique_username(base_name):
+async def generate_unique_username(base_name):
     username = base_name.lower().replace(" ", "_")
     # TODO: caching usernames
-    while CustomUser.objects.filter(username=username).exists():
+    while await sync_to_async(CustomUser.objects.filter(username=username).exists)():
         username = f"{base_name.lower().replace(' ', '_')}_{random.randint(9, 9)}"
+    print("4) ��� Unique username generated: ", username)
     return username
 
 
-def generate_password(length=12):
+async def generate_password(length=12):
     characters = string.ascii_letters + string.digits + string.punctuation
     password = "".join(random.choice(characters) for _ in range(length))
     return make_password(password)
@@ -164,14 +165,15 @@ async def generate_avatar_url(image_url, generated_username):
         image_bytes = await prepare_image_data_async(image_data=image_data)
         if image_bytes:
             object_key = f"{generated_username}_avatar.jpg"  # generate filename
+            print("4) ��� Object key generated: ", object_key)
 
             await upload_image_to_storage(image_bytes, f"users/{generated_username}/{object_key}")
 
             if settings.STORAGE_DESTINATION == "s3":
                 generated_avatar_url = f"https://{settings.AWS_CUSTOM_DOMAIN}/media/users/{generated_username}/{object_key}"
             else:
-                generated_avatar_url = f"{settings.MEDIA_URL}/users/{generated_username}/{object_key}"
-
+                generated_avatar_url = f"{settings.MEDIA_URL}users/{generated_username}/{object_key}"
+            print("5) ��� Avatar URL generated: ", generated_avatar_url)
             return generated_avatar_url
 
 

@@ -20,21 +20,6 @@ try:
 except Exception as e:
     print(f" Firebase credentials error: {e}")
 
-# firebase_credentials = credentials.Certificate({
-#     "type": env.str("TYPE", default=""),
-#     "project_id": env.str("FIREBASE_PROJECT_ID", default=""),
-#     "private_key_id": env.str("FIREBASE_PRIVATE_KEY_ID", default=""),
-#     "private_key": env.str("FIREBASE_PRIVATE_KEY", default="", multiline=True),
-#     "client_email": env.str("FIREBASE_CLIENT_EMAIL", default=""),
-#     "client_id": env.str("FIREBASE_CLIENT_ID", default=""),
-#     "auth_uri": env.str("AUTH_URI", default=""),
-#     "token_uri": env.str("TOKEN_URI", default=""),
-#     "auth_provider_x509_cert_url": env.str("AUTH_PROVIDER_X509_CERT_URI", default=""),
-#     "client_x509_cert_url": env.str("FIREBASE_CLIENT_CERT_URL", default="")
-# })
-# firebase_admin.initialize_app(firebase_credentials)
-
-
 firebase_credentials_path = BASE_DIR / "firebase_credentials.json"
 print(f"Firebase credentials path: {firebase_credentials_path}")
 firebase_credentials = credentials.Certificate(firebase_credentials_path)
@@ -54,16 +39,31 @@ async def custom_firebase_validation(firebase_id_token):
         uid = decoded_token["uid"]
         try:
             user = await asyncio.to_thread(partial(auth.get_user, uid))
-            print(f"📝 USER: {user}")
+            print(f"📝 USER display_name: {user.display_name}")
             return {
                 "display_name": user.display_name,
                 "email": user.email,
                 "phone_number": user.phone_number,
                 "photo_url": user.photo_url,
             }
-        except Exception as e:
-            print(f"🥶 user not exist: {e}")
+        except Exception as inner:
+            print(f"🥶 user not exist: {inner}")
             return None
-    except Exception as e:
-        print(f"🥶 invalid token: {e}")
+    except Exception as outer:
+        print(f"🥶 invalid token: {outer}")
         return None
+
+
+# firebase_credentials = credentials.Certificate({
+#     "type": env.str("TYPE", default=""),
+#     "project_id": env.str("FIREBASE_PROJECT_ID", default=""),
+#     "private_key_id": env.str("FIREBASE_PRIVATE_KEY_ID", default=""),
+#     "private_key": env.str("FIREBASE_PRIVATE_KEY", default="", multiline=True),
+#     "client_email": env.str("FIREBASE_CLIENT_EMAIL", default=""),
+#     "client_id": env.str("FIREBASE_CLIENT_ID", default=""),
+#     "auth_uri": env.str("AUTH_URI", default=""),
+#     "token_uri": env.str("TOKEN_URI", default=""),
+#     "auth_provider_x509_cert_url": env.str("AUTH_PROVIDER_X509_CERT_URI", default=""),
+#     "client_x509_cert_url": env.str("FIREBASE_CLIENT_CERT_URL", default="")
+# })
+# firebase_admin.initialize_app(firebase_credentials)

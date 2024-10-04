@@ -63,36 +63,45 @@ class FirebaseSocialAuthAPIView(APIView):
                 validate.get(key) for key in ("display_name", "email", "phone_number", "photo_url")
             )
 
-            generated_username = await to_thread(user_credential_generator, "username", firebase_user_display_name),
-            generated_password = await to_thread(partial(user_credential_generator, "password")),
-            generated_avatar_url = await to_thread(
-                user_credential_generator,
-                "avatar", firebase_user_photo_url, generated_username=generated_username,
-            ),
+            print(f"�� firebase_user_display_name: {firebase_user_display_name}")
+            print(f"�� firebase_user_email: {firebase_user_email}")
+            print(f"�� firebase_user_phone_number: {firebase_user_phone_number}")
+            print(f"�� firebase_user_photo_url: {firebase_user_photo_url}")
 
-            print(f"📝 generated_username: {generated_username}")
-            print(f"📝 generated_password: {generated_password}")
-            print(f"📝 generated_avatar_url: {generated_avatar_url}")
+            generated_username = await to_thread(
+                partial(user_credential_generator, "username", firebase_user_display_name),
+            )
+            g_username = await generated_username
+            generated_password = await to_thread(partial(user_credential_generator, "password"))
+            g_password = await generated_password
+            generated_avatar_url = await to_thread(
+                partial(user_credential_generator, "avatar", firebase_user_photo_url, g_username),
+            )
+            g_avatar_url = await generated_avatar_url
+
+            try:
+                print(f"📝 g_username: {g_username}")
+                print(f"📝 g_password: {g_password}")
+                print(f"📝 g_avatar_url: {g_avatar_url}")
+            except Exception as e:
+                print(f"�� error: {e}")
 
             user, created = await sync_to_async(CustomUser.objects.get_or_create)(
                 email=firebase_user_email,
                 defaults={
-                    "username": generated_username,
-                    "password": generated_password,
+                    "username": g_username,
+                    "password": g_password,
                     "phone_number": firebase_user_phone_number,
-                    "avatar": generated_avatar_url,
+                    "avatar": g_avatar_url,
                 }
             )
             print(f"🥳 created: {created}\n 🥳 user: {user}")
 
             if created:
                 created_user_serializer = CustomUserSerializer(user, many=False)
-                try:
-                    print(f"🥳 created user: {created_user_serializer.data}")
-                    print(f"🥳 created user: {await created_user_serializer.adata}")
-                except Exception as e:
-                    print(f"❌ error: {e}")
-                return Response(created_user_serializer.data, status=status.HTTP_200_OK)
+                data = await created_user_serializer.adata
+                print(f"🥳 created user: {data}")
+                return Response(data, status=status.HTTP_200_OK)
 
             user_serializer = CustomUserSerializer(user, many=False)
             return Response(user_serializer.data, status=status.HTTP_200_OK)
